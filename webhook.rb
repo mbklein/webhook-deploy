@@ -18,6 +18,10 @@ class DeployWebhook < Sinatra::Base
     end
   end
   
+  get '/' do
+    "OK"
+  end
+  
   post '/' do
     if request['X-Github-Event'] == 'push'
       payload = JSON.parse(request.body)
