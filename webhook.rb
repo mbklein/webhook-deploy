@@ -29,8 +29,9 @@ class DeployWebhook < Sinatra::Base
   post '/' do
     event = request.env['HTTP_X_GITHUB_EVENT'].to_s
     logger.info "Received event: `#{event}`"
-    if event == 'push'
-      payload = JSON.parse(request.body)
+    if request.env['HTTP_X_GITHUB_EVENT'] == 'push'
+      request.body.rewind
+      payload = JSON.parse(request.body.read)
       logger.info "Ref: #{payload['ref']}"
       if settings.refs.include?(payload['ref'])
         branch = payload['ref'].split('/',3)
