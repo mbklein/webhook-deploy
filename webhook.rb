@@ -9,8 +9,8 @@ class DeployWebhook < Sinatra::Base
   
   configure do
     set :refs, ['refs/heads/develop']
-    set :deploy_dir, '/home/deploy/avalon'
-    set :logfile, '/home/deploy/avalon_deploy.log'
+    set :deploy_dir, '/var/www/webhook-deploy/tmp/avalon'
+    set :logfile, '/var/www/webhook-deploy/log/avalon_deploy.log'
   end
   
   helpers do
@@ -34,9 +34,10 @@ class DeployWebhook < Sinatra::Base
       payload = JSON.parse(request.body.read)
       logger.info "Ref: #{payload['ref']}"
       if settings.refs.include?(payload['ref'])
-        branch = payload['ref'].split('/',3)
+        branch = payload['ref'].split('/',3).last
         deploy(branch)
       end
     end
+    event
   end
 end
