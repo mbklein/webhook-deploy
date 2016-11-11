@@ -22,7 +22,13 @@ class DeployWebhook < Sinatra::Base
     def deploy(branch)
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
       Dir.chdir(settings.deploy_dir) do
-        system "git fetch && git checkout #{branch} && git pull origin #{branch} >> #{settings.logfile} 2>&1"
+        child_pid = Process.fork do
+          system "git fetch && git checkout #{branch} && git pull origin #{branch} >> #{settings.logfile} 2>&1"
+          sleep 10
+          Process.exit
+        end
+        logger.info "PID: #{child_pid}"
+        Process.detach(child_pid)
       end
     end
     
