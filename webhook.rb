@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'sinatra'
-require 'sinatra-logger'
 require 'json'
 
 class DeployWebhook < Sinatra::Base
