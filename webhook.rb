@@ -27,7 +27,6 @@ class DeployWebhook < Sinatra::Base
   end
   
   post '/' do
-    logger.info request.env.keys.join(', ')
     logger.info "Received event: `#{request.env['HTTP_X_GITHUB_EVENT']}`"
     if request.env['HTTP_X_GITHUB_EVENT'] == 'push'
       payload = JSON.parse(request.body)
