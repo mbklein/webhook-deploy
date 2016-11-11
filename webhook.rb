@@ -27,8 +27,8 @@ class DeployWebhook < Sinatra::Base
   end
   
   post '/' do
-    logger.info "Received event: `#{request['X-Github-Event']}`"
-    if request['X-Github-Event'] == 'push'
+    logger.info "Received event: `#{request.env['X-Github-Event']}`"
+    if request.env['X-Github-Event'] == 'push'
       payload = JSON.parse(request.body)
       logger.info "Ref: #{payload['ref']}"
       if settings.refs.include?(payload['ref'])
