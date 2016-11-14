@@ -33,14 +33,14 @@ class DeployWebhook < Sinatra::Base
 
     def deploy(branch)
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
-      child_pid = Process.fork do
+#      child_pid = Process.fork do
         cmd = deployment_script(branch)
         logger.info "Running command: #{cmd}"
         system cmd
         Process.exit
-      end
-      logger.info "PID: #{child_pid}"
-      Process.detach(child_pid)
+#      end
+#      logger.info "PID: #{child_pid}"
+#      Process.detach(child_pid)
     end
     
     def verify_signature!
