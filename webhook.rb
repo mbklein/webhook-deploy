@@ -11,6 +11,7 @@ class DeployWebhook < Sinatra::Base
     set :refs, ENV['WEBHOOK_REFS'].split(/,\s*/)
     set :deploy_dir, ENV['WEBHOOK_SOURCE']
     set :logfile, ENV['WEBHOOK_LOG']
+    set :stage, ENV['WEBHOOK_STAGE']
   end
   
   before do
@@ -24,6 +25,7 @@ class DeployWebhook < Sinatra::Base
       child_pid = Process.fork do
         Dir.chdir(settings.deploy_dir) do
           system "git fetch && git checkout #{branch} && git pull origin #{branch} >> #{settings.logfile} 2>&1"
+          system "bundle install && bundle exec cap #{settings.stage} deploy >> #{settings.logfile} 2>&1"
           sleep 10
           Process.exit
         end
