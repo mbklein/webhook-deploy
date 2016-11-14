@@ -28,8 +28,8 @@ class DeployWebhook < Sinatra::Base
         'SOURCE' => settings.deploy_dir,
         'STAGE' => settings.stage
       }
-      cmd = ['/bin/bash','-l','-c',File.expand_path('../bin/deploy',__FILE__)]
-      logger.info "Running command: #{cmd.join(' ')}"
+      cmd = ['/bin/bash','-l','-c',File.expand_path('../bin/deploy',__FILE__)].join ' '
+      logger.info "Running command: #{cmd}"
       child_pid = Process.spawn(env, cmd, unsetenv_others: true)
       logger.info "PID: #{child_pid}"
       Process.detach(child_pid)
