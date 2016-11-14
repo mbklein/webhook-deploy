@@ -23,6 +23,7 @@ class DeployWebhook < Sinatra::Base
     def deploy(branch)
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
       env = { 
+        'BUNDLE_GEMFILE' => File.join(settings.deploy_dir,'Gemfile'),
         'LOG' => settings.logfile, 
         'SCM_BRANCH' => branch, 
         'SOURCE' => settings.deploy_dir,
@@ -30,7 +31,7 @@ class DeployWebhook < Sinatra::Base
       }
       cmd = ['/bin/bash','-l','-c',File.expand_path('../bin/deploy',__FILE__)].join ' '
       logger.info "Running command: #{cmd}"
-      child_pid = Process.spawn(env, cmd, unsetenv_others: true)
+      child_pid = Process.spawn(env, cmd, unsetenv_others: false)
       logger.info "PID: #{child_pid}"
       Process.detach(child_pid)
     end
