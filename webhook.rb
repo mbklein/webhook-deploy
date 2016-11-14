@@ -35,7 +35,7 @@ class DeployWebhook < Sinatra::Base
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
       child_pid = Process.fork do
         cmd = deployment_script(branch)
-        logger.debug "Running command: #{cmd}"
+        logger.info "Running command: #{cmd}"
         system cmd
         Process.exit
       end
