@@ -20,18 +20,31 @@ class DeployWebhook < Sinatra::Base
   end
   
   helpers do
+    def deployment_script(branch)
+      [
+        ['git','fetch'],
+        ['git','checkout',branch],
+        ['git','pull','origin',branch],
+        ['bundle','install'],
+        ['bundle','exec','cap',settings.stage,'deploy']
+      ]
+    end
+
     def deploy(branch)
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
       child_pid = Process.fork do
         Dir.chdir(settings.deploy_dir) do
-          system "git fetch && git checkout #{branch} && git pull origin #{branch} >> #{settings.logfile} 2>&1"
-          system "bundle install && bundle exec cap #{settings.stage} deploy >> #{settings.logfile} 2>&1"
-          sleep 10
-          Process.exit
+          env = { 'GIT_DIR' => settings.deploy_dir }
+          File.open(settings.logfile, 'a') do |log|
+            deployment_script(branch).each do |cmd|
+              IO.popen(env, *cmd) { |pipe| pipe.each { |line| log.write(line) } }
+            end
+          end
         end
-        logger.info "PID: "
-        Process.detach(child_pid)
+        Process.exit
       end
+      logger.info "PID: #{child_pid}"
+      Process.detach(child_pid)
     end
     
     def verify_signature!
