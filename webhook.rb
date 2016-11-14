@@ -50,7 +50,7 @@ class DeployWebhook < Sinatra::Base
     verify_signature!
     event = request.env['HTTP_X_GITHUB_EVENT'].to_s
     logger.info "Received event: `#{event}`"
-    if request.env['HTTP_X_GITHUB_EVENT'] == 'push'
+    if event == 'push'
       payload = JSON.parse(@payload_body)
       logger.info "Ref: #{payload['ref']}"
       if settings.refs.include?(payload['ref'])
