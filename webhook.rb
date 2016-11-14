@@ -36,8 +36,9 @@ class DeployWebhook < Sinatra::Base
         Dir.chdir(settings.deploy_dir) do
           env = { 'GIT_DIR' => settings.deploy_dir }
           File.open(settings.logfile, 'a') do |log|
+            log.sync = true
             deployment_script(branch).each do |cmd|
-              IO.popen(env, *cmd) { |pipe| pipe.each { |line| log.write(line) } }
+              IO.popen(env, cmd) { |pipe| pipe.each { |line| log.write(line) } }
             end
           end
         end
