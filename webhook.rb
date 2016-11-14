@@ -22,26 +22,21 @@ class DeployWebhook < Sinatra::Base
   helpers do
     def deployment_script(branch)
       [
-        ['git','fetch'],
-        ['git','checkout',branch],
-        ['git','pull','origin',branch],
-        ['bundle','install'],
-        ['bundle','exec','cap',settings.stage,'deploy']
-      ]
+        %{cd "#{settings.deploy_dir}"},
+        %{git fetch},
+        %{git checkout "#{branch}"},
+        %{git pull origin "#{branch}"},
+        %{bundle install},
+        %{bundle exec cap "#{settings.stage}" deploy}
+      ].collect { |cmd| %{#{cmd} >> "#{settings.logfile}" 2>&1} }.join " && "
     end
 
     def deploy(branch)
       logger.info "Deploying #{branch} from #{settings.deploy_dir}"
       child_pid = Process.fork do
-        Dir.chdir(settings.deploy_dir) do
-          env = { 'GIT_DIR' => settings.deploy_dir }
-          File.open(settings.logfile, 'a') do |log|
-            log.sync = true
-            deployment_script(branch).each do |cmd|
-              IO.popen(env, cmd) { |pipe| pipe.each { |line| log.write(line) } }
-            end
-          end
-        end
+        cmd = deployment_script(branch)
+        logger.debug "Running command: #{cmd}"
+        system cmd
         Process.exit
       end
       logger.info "PID: #{child_pid}"
