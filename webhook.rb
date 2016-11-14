@@ -9,7 +9,7 @@ class DeployWebhook < Sinatra::Base
   
   configure do
     set :refs, ENV['WEBHOOK_REFS'].split(/,\s*/)
-    set :deploy_dir, ENV['WEBHOOK_DIR']
+    set :deploy_dir, ENV['WEBHOOK_SOURCE']
     set :logfile, ENV['WEBHOOK_LOG']
   end
   
@@ -27,7 +27,7 @@ class DeployWebhook < Sinatra::Base
           sleep 10
           Process.exit
         end
-        logger.info "PID: #{child_pid}"
+        logger.info "PID: "
         Process.detach(child_pid)
       end
     end
