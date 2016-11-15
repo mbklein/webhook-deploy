@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd "$SOURCE"                    >> "$LOG" 2>&1
-git fetch                       >> "$LOG" 2>&1
-git checkout $SCM_BRANCH        >> "$LOG" 2>&1
-git pull origin $SCM_BRANCH     >> "$LOG" 2>&1
-bundle install                  >> "$LOG" 2>&1
-bundle exec cap $STAGE deploy   >> "$LOG" 2>&1
+cd "$SOURCE"
+git fetch
+git checkout $SCM_BRANCH
+git pull origin $SCM_BRANCH
+bundle install
+bundle exec cap $STAGE deploy
